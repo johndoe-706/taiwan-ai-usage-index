@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  taui:
+    build: .
+    container_name: taui-app
+    volumes:
+      - ./data:/app/data
+      - ./figures:/app/figures
+      - ./report:/app/report
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    command: python -m src.metrics.aui --demo
+
+  taui-api:
+    build: .
+    container_name: taui-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./figures:/app/figures
+      - ./report:/app/report
+    environment:
+      - PYTHONUNBUFFERED=1
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    command: python -m src.api.server
+
+  jupyter:
+    image: jupyter/datascience-notebook:latest
+    container_name: taui-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/home/jovyan/work
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
