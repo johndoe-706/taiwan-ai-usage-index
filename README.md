@@ -174,3 +174,20 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Notes
 - This repo is scaffolding for research reproducibility. Replace/extend sample data with your own **de-identified** volunteer data or open data slices.
 - Avoid committing PII. The tests enforce privacy filtering behavior.
+
+## cite
+```
+@online{appelmccrorytamkin2025geoapi,
+
+author = {Ruth Appel and Peter McCrory and Alex Tamkin and Michael Stern and Miles McCain and Tyler Neylon],
+
+title = {Anthropic Economic Index report: Uneven geographic and enterprise AI adoption},
+
+date = {2025-09-15},
+
+year = {2025},
+
+url = {www.anthropic.com/research/anthropic-economic-index-september-2025-report},
+
+}
+```
