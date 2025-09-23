@@ -1,0 +1,9 @@
+country_code,conversation_count,user_count,timestamp,task_type
+TWN,50,25,2024-08-01,coding
+USA,100,50,2024-08-01,writing
+SGP,30,20,2024-08-01,analysis
+KOR,75,40,2024-08-01,research
+JPN,120,60,2024-08-01,translation
+HKG,45,30,2024-08-01,summarization
+GBR,200,100,2024-08-01,coding
+CAN,80,40,2024-08-01,writing
