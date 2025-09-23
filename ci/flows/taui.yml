@@ -1,0 +1,89 @@
+# TAUI end-to-end workflow (CLAUDE-FLOW)
+name: "TAUI E2E"
+strategy: parallel
+tasks:
+  - name: "P1 Ingest"
+    description: "讀取 data/raw/anthropic_open/*.csv → 產出 data/interim/open/*.parquet；同儕國家濾出"
+    hooks:
+      pre:  ["pre-task"]
+      post: ["post-task"]
+    agents:
+      complexity: "medium"
+    bash:
+      - "pytest -q tests/test_ingest.py || true"
+    files:
+      read:
+        - "src/ingest/anthropic_open_data.py"
+      write: []
+
+  - name: "P2 Labeling"
+    description: "few-shot 任務分類與合作模式：實作 onets.py / mode.py 接口；新增測試樣本"
+    agents:
+      complexity: "medium"
+    files:
+      read:
+        - "prompts/task_labeler.md"
+        - "prompts/mode_labeler.md"
+      write:
+        - "src/labeling/onets.py"
+        - "src/labeling/mode.py"
+    bash:
+      - "pytest -q tests/test_labelers.py"
+
+  - name: "P3 Metrics/AUI"
+    description: "計算 AUI、隱私門檻、Tier；跑 demo 產出 CSV"
+    agents:
+      complexity: "high"
+    files:
+      read:
+        - "src/metrics/aui_calculator.py"
+        - "src/metrics/privacy_filter.py"
+      write:
+        - "data/processed/aui_results.csv"
+    bash:
+      - "python src/metrics/calculate_demo.py"
+      - "pytest -q tests/test_metrics.py"
+
+  - name: "P4 Visualization"
+    description: "產生 6 張主要圖表：AUI 指數、趨勢、產業分布、任務複雜度、隱私流量、同儕比較"
+    agents:
+      complexity: "medium"
+    files:
+      read:
+        - "src/visualization/plot_aui.py"
+        - "src/visualization/plot_trends.py"
+      write:
+        - "figures/*.png"
+    bash:
+      - "python src/visualization/generate_all_plots.py"
+
+  - name: "P5 Report"
+    description: "整合數據與圖表產生 HTML/PDF 報告"
+    agents:
+      complexity: "low"
+    files:
+      read:
+        - "report/template.html"
+        - "data/processed/aui_results.csv"
+      write:
+        - "report/taui_report_latest.html"
+        - "report/taui_report_latest.pdf"
+    bash:
+      - "python src/report/generate_report.py"
+      - "echo 'Report generated at report/taui_report_latest.html'"
+
+# 全局配置
+config:
+  hooks:
+    global:
+      pre: ["pre-task", "session-restore"]
+      post: ["post-task", "notify", "session-end"]
+  memory:
+    persist: true
+    path: ".swarm/memory.db"
+  agents:
+    auto_spawn: true
+    types: ["researcher", "coder", "tester", "reviewer"]
+  monitoring:
+    enabled: true
+    metrics: ["token_usage", "performance", "errors"]
