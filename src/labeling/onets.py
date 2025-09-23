@@ -1,15 +1,121 @@
-from typing import Dict, Any
+"""
+O*NET Task Classification Module
+
+This module provides functionality to classify conversation summaries into O*NET
+occupational task categories using language models. Part of the Taiwan AI Usage Index (TAUI).
+"""
+
 import json
+import logging
+from pathlib import Path
+from typing import Dict, Any, Optional, List
+import pandas as pd
 import re
 
-def classify_task_llm(text: str) -> Dict[str, Any]:
-    """LLM-based classifier for O*NET/SOC task categorization.
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class TaskClassifier:
+    """Classifier for O*NET task categories using LLM-based classification."""
+
+    def __init__(self, prompt_path: Optional[str] = None):
+        """
+        Initialize the TaskClassifier.
+
+        Args:
+            prompt_path: Path to the task labeling prompt file
+        """
+        self.prompt_path = prompt_path or "prompts/task_labeler.md"
+        self.prompt_content = self._load_prompt()
+
+        # O*NET task categories with skill levels
+        self.categories = {
+            "Computer & Mathematical": {"level": 4, "description": "Software development, data science, algorithm design"},
+            "Management": {"level": 5, "description": "Executive decisions, strategic planning, team leadership"},
+            "Business & Financial": {"level": 4, "description": "Financial analysis, business strategy, consulting"},
+            "Life Sciences": {"level": 4, "description": "Research, medical analysis, biotechnology"},
+            "Physical Sciences": {"level": 4, "description": "Engineering, research, technical analysis"},
+            "Legal": {"level": 4, "description": "Legal analysis, contract review, regulatory compliance"},
+            "Education": {"level": 3, "description": "Teaching, training development, curriculum design"},
+            "Healthcare": {"level": 3, "description": "Medical practice, patient care, clinical analysis"},
+            "Social Sciences": {"level": 3, "description": "Research, policy analysis, social services"},
+            "Arts/Design/Media": {"level": 3, "description": "Creative work, design, content creation"},
+            "Office/Admin": {"level": 2, "description": "Administrative tasks, data entry, scheduling"},
+            "Sales": {"level": 2, "description": "Customer service, sales support, basic marketing"},
+            "Production": {"level": 1, "description": "Manufacturing, assembly, quality control"},
+            "Other": {"level": 1, "description": "General support tasks, maintenance, basic services"}
+        }
+
+    def _load_prompt(self) -> str:
+        """Load the task classification prompt from file."""
+        try:
+            prompt_file = Path(self.prompt_path)
+            if prompt_file.exists():
+                with open(prompt_file, 'r', encoding='utf-8') as f:
+                    return f.read()
+            else:
+                logger.warning(f"Prompt file not found: {self.prompt_path}")
+                return self._get_default_prompt()
+        except Exception as e:
+            logger.error(f"Error loading prompt: {e}")
+            return self._get_default_prompt()
+
+    def _get_default_prompt(self) -> str:
+        """Return a default prompt if file loading fails."""
+        return """
+        Classify the following conversation summary into an O*NET task category.
+        Categories: Computer & Mathematical, Management, Business & Financial, etc.
+        Respond with JSON containing top_category, task_code, confidence, and rationale.
+        """
+
+def classify_task_llm(text: str,
+                     model: str = "mock",
+                     api_key: Optional[str] = None,
+                     classifier: Optional[TaskClassifier] = None) -> Dict[str, Any]:
+    """
+    Classify a conversation summary into O*NET task categories using LLM.
 
     Args:
         text: Conversation or task description text
+        model: Model identifier (currently supports "mock" for testing)
+        api_key: API key for the language model (not used in mock mode)
+        classifier: Pre-initialized TaskClassifier instance
 
     Returns:
-        Dict with top_category, task_code, confidence, and rationale
+        Dictionary containing:
+        - top_category: The classified O*NET category
+        - task_code: Optional fine-grained code or short label
+        - confidence: Confidence score (0.0-1.0)
+        - rationale: Explanation of the classification
+
+    Raises:
+        ValueError: If text is empty or invalid
+        RuntimeError: If classification fails
+    """
+    if not text or not text.strip():
+        raise ValueError("Conversation text cannot be empty")
+
+    if classifier is None:
+        classifier = TaskClassifier()
+
+    try:
+        logger.info(f"Classifying task with model: {model}")
+
+        if model == "mock":
+            # Use existing regex-based classification for mock mode
+            return _classify_task_regex(text, classifier)
+        else:
+            # Future: Implement actual LLM API calls
+            raise NotImplementedError(f"Model '{model}' not yet implemented")
+
+    except Exception as e:
+        logger.error(f"Task classification failed: {e}")
+        raise RuntimeError(f"Failed to classify task: {str(e)}")
+
+def _classify_task_regex(text: str, classifier: TaskClassifier) -> Dict[str, Any]:
+    """
+    Regex-based classification function for testing and fallback.
     """
     # Clean and normalize input
     text_lower = text.lower().strip()
@@ -110,6 +216,151 @@ def classify_task_llm(text: str) -> Dict[str, Any]:
         "rationale": rationale
     }
 
+def classify_batch_tasks(summaries: List[str],
+                        model: str = "mock",
+                        api_key: Optional[str] = None) -> List[Dict[str, Any]]:
+    """
+    Classify multiple conversation summaries in batch.
+
+    Args:
+        summaries: List of conversation summaries to classify
+        model: Model identifier
+        api_key: API key for the language model
+
+    Returns:
+        List of classification results
+    """
+    classifier = TaskClassifier()
+    results = []
+
+    for i, summary in enumerate(summaries):
+        try:
+            result = classify_task_llm(summary, model, api_key, classifier)
+            result["index"] = i
+            results.append(result)
+        except Exception as e:
+            logger.error(f"Failed to classify summary {i}: {e}")
+            results.append({
+                "index": i,
+                "top_category": "ERROR",
+                "task_code": "",
+                "confidence": 0.0,
+                "rationale": f"Classification failed: {str(e)}"
+            })
+
+    return results
+
+def apply_privacy_filters(classifications: List[Dict[str, Any]],
+                         min_conversations: int = 15,
+                         min_users: int = 5) -> List[Dict[str, Any]]:
+    """
+    Apply privacy filters to classification results.
+
+    Suppresses categories with fewer than minimum thresholds for privacy protection.
+
+    Args:
+        classifications: List of classification results
+        min_conversations: Minimum number of conversations required
+        min_users: Minimum number of users required (mock implementation)
+
+    Returns:
+        Filtered classification results with suppressed categories marked
+    """
+    # Count classifications by category
+    category_counts = {}
+    for classification in classifications:
+        category = classification.get("top_category", "Unknown")
+        category_counts[category] = category_counts.get(category, 0) + 1
+
+    # Apply suppression
+    filtered_results = []
+    for classification in classifications:
+        category = classification.get("top_category", "Unknown")
+        if category_counts.get(category, 0) < min_conversations:
+            # Suppress this category
+            filtered_classification = classification.copy()
+            filtered_classification["top_category"] = "SUPPRESSED"
+            filtered_classification["original_category"] = category
+            filtered_classification["suppression_reason"] = f"Fewer than {min_conversations} conversations"
+            filtered_results.append(filtered_classification)
+        else:
+            filtered_results.append(classification)
+
+    return filtered_results
+
+def get_category_statistics(classifications: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Generate statistics about task classifications.
+
+    Args:
+        classifications: List of classification results
+
+    Returns:
+        Dictionary containing classification statistics
+    """
+    total_count = len(classifications)
+    if total_count == 0:
+        return {"total": 0, "categories": {}, "average_confidence": 0.0}
+
+    category_stats = {}
+    confidence_scores = []
+
+    for classification in classifications:
+        category = classification.get("top_category", "Unknown")
+        confidence = classification.get("confidence", 0.0)
+
+        if category not in category_stats:
+            category_stats[category] = {
+                "count": 0,
+                "percentage": 0.0,
+                "avg_confidence": 0.0,
+                "confidence_scores": []
+            }
+
+        category_stats[category]["count"] += 1
+        category_stats[category]["confidence_scores"].append(confidence)
+        confidence_scores.append(confidence)
+
+    # Calculate percentages and averages
+    for category in category_stats:
+        stats = category_stats[category]
+        stats["percentage"] = (stats["count"] / total_count) * 100
+        stats["avg_confidence"] = sum(stats["confidence_scores"]) / len(stats["confidence_scores"])
+        # Remove intermediate lists to clean up output
+        del stats["confidence_scores"]
+
+    return {
+        "total": total_count,
+        "categories": category_stats,
+        "average_confidence": sum(confidence_scores) / len(confidence_scores) if confidence_scores else 0.0
+    }
+
+# Legacy function for backward compatibility
 def classify_batch(texts: list) -> list:
-    """Classify multiple texts in batch."""
+    """Legacy function - use classify_batch_tasks instead."""
     return [classify_task_llm(text) for text in texts]
+
+# Main execution for testing
+if __name__ == "__main__":
+    # Example usage
+    test_summaries = [
+        "User requested comprehensive market analysis of Taiwan's tech sector",
+        "User needed help with data entry tasks and spreadsheet formatting",
+        "User asked for Python code debugging and algorithm optimization",
+        "User wanted creative design for marketing materials and branding"
+    ]
+
+    print("Testing O*NET Task Classification...")
+    results = classify_batch_tasks(test_summaries, model="mock")
+
+    for i, result in enumerate(results):
+        print(f"\nSummary {i+1}: {test_summaries[i][:50]}...")
+        print(f"Category: {result['top_category']}")
+        print(f"Task Code: {result['task_code']}")
+        print(f"Confidence: {result['confidence']:.2f}")
+        print(f"Rationale: {result['rationale']}")
+
+    print("\n" + "="*50)
+    print("Classification Statistics:")
+    stats = get_category_statistics(results)
+    print(json.dumps(stats, indent=2))

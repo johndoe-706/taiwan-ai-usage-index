@@ -1,0 +1,62 @@
+{
+  "report_info": {
+    "title": "Taiwan AI Usage Index (TAUI)",
+    "version": "1.0.0",
+    "generated_on": "2025-09-23T12:15:22.392887",
+    "language": "en-US",
+    "data_period": "2024"
+  },
+  "statistics": {
+    "total_regions": 8,
+    "avg_aui_score": 0.725,
+    "std_aui_score": 0.0892828570971414,
+    "max_aui_score": 0.85,
+    "min_aui_score": 0.58,
+    "median_aui_score": 0.715
+  },
+  "tier_distribution": {
+    "high": 2,
+    "medium": 6,
+    "low": 0
+  },
+  "regional_scores": [
+    {
+      "region": "台北市",
+      "aui_score": 0.85
+    },
+    {
+      "region": "新北市",
+      "aui_score": 0.78
+    },
+    {
+      "region": "桃園市",
+      "aui_score": 0.72
+    },
+    {
+      "region": "台中市",
+      "aui_score": 0.69
+    },
+    {
+      "region": "台南市",
+      "aui_score": 0.65
+    },
+    {
+      "region": "高雄市",
+      "aui_score": 0.71
+    },
+    {
+      "region": "新竹市",
+      "aui_score": 0.82
+    },
+    {
+      "region": "基隆市",
+      "aui_score": 0.58
+    }
+  ],
+  "privacy_compliance": {
+    "min_conversations": 15,
+    "min_users": 5,
+    "pii_removed": true,
+    "anonymized": true
+  }
+}
